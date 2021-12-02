@@ -31,12 +31,8 @@ int Day1::puzzle2() {
     ifstream ifs(filename, ios::binary);
     int last = std::numeric_limits<int>::max();
     int result = 0;
-    int a = 0;
-    int b = 0;
-    int c = 0;
-    ifs >> a;
-    ifs >> b;
-    ifs >> c;
+    int a{}, b{}, c{};
+    ifs >> a >> b >> c;
     vector<int> v;
     v.push_back(a + b + c);
     while (!ifs.eof()) {
@@ -48,12 +44,11 @@ int Day1::puzzle2() {
     }
 
     for (int depth : v) {
-
-        ifs >> depth;
         if (depth > last) {
             result++;
         }
         last = depth;
     }
+
     return result;
 }
