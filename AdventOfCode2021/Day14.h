@@ -1,10 +1,10 @@
 #pragma once
 #include "BaseDay.h"
 
-class Day2 : 
+class Day14 : 
     public BaseDay {    
 public:
-    Day2();
+    Day14();
     int puzzle1();
     int puzzle2();
 };
