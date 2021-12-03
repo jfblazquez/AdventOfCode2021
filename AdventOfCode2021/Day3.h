@@ -7,5 +7,7 @@ public:
     Day3();
     int puzzle1();
     int puzzle2();
+private:
+    int locateVal(const vector<int>&, bool control);
 };
 
