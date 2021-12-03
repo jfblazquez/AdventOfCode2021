@@ -9,7 +9,7 @@ using namespace std;
 #include "Day3.h"
 
 Day3::Day3() {
-    day = 2;
+    day = 3;
     filename = "input/day3.txt";
 }
 
