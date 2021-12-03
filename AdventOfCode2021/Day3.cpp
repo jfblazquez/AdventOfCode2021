@@ -17,25 +17,19 @@ int Day3::puzzle1() {
     ifstream ifs(filename, ios::binary);
     string data{};
     vector<int> amount;
-    bool first = true;
+    amount.insert(amount.begin(), 12, 0);
     int elements = 0;
     while (ifs >> data) {
         elements ++;
-        int number = stoi(data, 0, 2);
+        int number = stoi(data, nullptr, 2);
         int bitpos = 0;
         int bitval = 1;
         while (bitval <= 1 << 11) {
             int value = (number & bitval) >> bitpos;
-            if (first) {                
-                    amount.push_back(value);
-            }
-            else {
-                amount[bitpos] += value;
-            }          
+            amount[bitpos] += value;                   
             bitval <<= 1;
             bitpos++;
         }
-        first = false;
     }
 
     //amount is lsb order and count 1
@@ -55,7 +49,6 @@ int Day3::puzzle1() {
 }
 
 int Day3::puzzle2() {
-
     ifstream ifs(filename, ios::binary);
     string data{};
     vector<int> vals;
@@ -72,26 +65,19 @@ int Day3::puzzle2() {
     return result;
 }
 
-int Day3::locateVal(const vector<int>& vals, bool mostCommon) {
+int Day3::locateVal(const vector<int>& vals, bool mostCommonIsOne) {
     vector<int> currentVals{ vals };
     int ret = -1;
     for (int exp = 11; exp >= 0 && ret < 0; exp--) {
         int elements = currentVals.size();
         int expVal = 1 << exp;
         int ones = std::count_if(currentVals.begin(), currentVals.end(),
-            [&](int i) {return (expVal)&i;});
-        int keep = -1;
-        if (2 * ones >= elements) {
-            //most common is one
-            keep = mostCommon ? 1 : 0;
-        }
-        else {
-            keep = mostCommon ? 0 : 1;
-        }
+            [&](int i) {return expVal & i;});
+        int numberKeep = (2 * ones >= elements) ^ !mostCommonIsOne; //When mostCommonIsOne, return 1 when above average. 
 
         vector<int> temp;
         std::copy_if(currentVals.begin(), currentVals.end(),
-            std::back_inserter(temp), [&](int i) {return (i & expVal) == keep << exp;});
+            std::back_inserter(temp), [&](int i) {return (i & expVal) == numberKeep << exp;});
 
         currentVals = std::move(temp);
 
