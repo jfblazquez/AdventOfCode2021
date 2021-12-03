@@ -7,17 +7,17 @@ using namespace std;
 
 int main() {
 
-	/*
+	
 	//Test current day
-	Dayx day;
-	day.puzzle1();
-	day.puzzle2();
-	return;
-	*/
+	/*Dayx day;
+	cout << "Day: " << day.getDay() << " puzzle1: " << day.puzzle1() << "\n";
+	cout << "Day: " << day.getDay() << " puzzle2: " << day.puzzle2() << "\n";	
+	return 0;*/
+	
 	vector<BaseDay*> calendar{ 
 		new Day1(),
-		new Day2()/*,
-		new Day3(),
+		new Day2(),
+		new Day3()/*,
 		new Day4(),
 		new Day5(),
 		new Day6(),
