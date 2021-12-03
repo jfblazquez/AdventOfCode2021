@@ -39,11 +39,10 @@ int Day3::puzzle1() {
     }
 
     //amount is lsb order and count 1
-    int halfElements = elements / 2;
     unsigned int gammaRate = 0;
     int bitval = 1;
     for (int amountOne : amount) {
-        if (amountOne > halfElements) {
+        if (2*amountOne > elements) {
             gammaRate += bitval;
         }
         bitval <<= 1;
@@ -66,62 +65,39 @@ int Day3::puzzle2() {
         vals.push_back(number);
     }
 
-    //oxigen (most common)
-    vector<int> oxigen{ vals };
-    int oxigenVal = -1;
-    for (int exp = 11; exp >= 0 && oxigenVal < 0; exp--) {
-        int elements = oxigen.size();
-        int expVal = 1 << exp;
-        int ones = std::count_if(oxigen.begin(), oxigen.end(),
-            [&](int i) {return (expVal) & i;});
-        int keep = -1;
-        if (2*ones >= elements) {
-            //most common is one
-            keep = 1;
-        }
-        else {
-            keep = 0;
-        }
-
-        vector<int> temp;
-        std::copy_if(oxigen.begin(), oxigen.end(), 
-            std::back_inserter(temp), [&](int i) {return (i & expVal) == keep << exp;});
-
-        oxigen = std::move(temp);
-
-        if (oxigen.size() == 1) {
-            oxigenVal = oxigen[0];
-        }
-    }
-
-    //co2
-    vector<int> co2{ vals };
-    int co2Val = -1;
-    for (int exp = 11; exp >= 0 && co2Val < 0; exp--) {
-        int elements = co2.size();
-        int expVal = 1 << exp;
-        int ones = std::count_if(co2.begin(), co2.end(),
-            [&](int i) {return (expVal)&i;});
-        int keep = -1;
-        if (2*ones >= elements) {
-            //most common is one
-            keep = 0;
-        }
-        else {
-            keep = 1;
-        }
-
-        vector<int> temp;
-        std::copy_if(co2.begin(), co2.end(),
-            std::back_inserter(temp), [&](int i) {return (i & expVal) == keep << exp;});
-
-        co2 = std::move(temp);
-
-        if (co2.size() == 1) {
-            co2Val = co2[0];
-        }
-    }
+    int oxigenVal = locateVal(vals, true);
+    int co2Val = locateVal(vals, false);
 
     int result{oxigenVal*co2Val};
     return result;
+}
+
+int Day3::locateVal(const vector<int>& vals, bool mostCommon) {
+    vector<int> currentVals{ vals };
+    int ret = -1;
+    for (int exp = 11; exp >= 0 && ret < 0; exp--) {
+        int elements = currentVals.size();
+        int expVal = 1 << exp;
+        int ones = std::count_if(currentVals.begin(), currentVals.end(),
+            [&](int i) {return (expVal)&i;});
+        int keep = -1;
+        if (2 * ones >= elements) {
+            //most common is one
+            keep = mostCommon ? 1 : 0;
+        }
+        else {
+            keep = mostCommon ? 0 : 1;
+        }
+
+        vector<int> temp;
+        std::copy_if(currentVals.begin(), currentVals.end(),
+            std::back_inserter(temp), [&](int i) {return (i & expVal) == keep << exp;});
+
+        currentVals = std::move(temp);
+
+        if (currentVals.size() == 1) {
+            ret = currentVals[0];
+        }
+    }
+    return ret;
 }
