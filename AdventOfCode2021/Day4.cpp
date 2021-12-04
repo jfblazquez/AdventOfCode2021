@@ -93,24 +93,15 @@ int Board::unmarked() {
     return ret;
 }
 
-bool Board::bingo()
-{
-    
+bool Board::bingo() {
     for (int x = 0; x < 5; x++) {
-        int marked = 0;
+        int markedRow = 0;
+        int markedCol = 0;
         for (int y = 0; y < 5; y++) {            
             int pos = x * 5 + y;
-            if (arrayValues[pos] < 0) marked++;
-            if (marked == 5) return true;
-        }
-    }
-
-    for (int x = 0; x < 5; x++) {
-        int marked = 0;
-        for (int y = 0; y < 5; y++) {
-            int pos = x + 5 * y;
-            if (arrayValues[pos] < 0) marked++;
-            if (marked == 5) return true;
+            if (arrayValues[x * 5 + y] < 0) markedRow++;
+            if (arrayValues[x + 5 * y] < 0) markedCol++;
+            if (markedRow == 5 || markedCol == 5) return true;
         }
     }
 
