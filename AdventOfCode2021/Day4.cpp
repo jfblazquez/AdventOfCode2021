@@ -36,9 +36,6 @@ int Day4::puzzle2() {
 
     Board& boardNoBingo = boards[0];
     for (auto drawNumber : drawNumbers) {
-        if (drawNumber == 94) {
-            cout << 666;
-        }
         for (Board& b : boards) {
             b.mark(drawNumber);
             if (b.bingo()) {
