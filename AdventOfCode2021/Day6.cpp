@@ -28,12 +28,10 @@ long long Day6::solve(int days)
     ifstream ifs(filename, ios::binary);
     vector<int> lfishsinitial;
     string strstream;
-    ifs >> strstream;
-    lfishsinitial = std::move(numbersToVector(strstream));
 
     std::array<long long, 9> lfage = { 0,0,0,0,0,0,0,0,0 };
-
-    for (auto lfish : lfishsinitial) {
+    while (getline(ifs, strstream, ',')) {
+        int lfish(stoi(strstream));
         lfage[lfish]++;
     }
 
@@ -48,12 +46,4 @@ long long Day6::solve(int days)
     }
 
     return std::accumulate(lfage.begin(), lfage.end(), (long long)0);
-}
-
-vector<int> Day6::numbersToVector(string str) {
-    vector<int> retVector;
-    std::regex regexz(",");
-    vector<string> list(sregex_token_iterator(str.begin(), str.end(), regexz, -1), sregex_token_iterator());
-    std::for_each(list.begin(), list.end(), [&](string s) {retVector.push_back(stoi(s));});
-    return retVector;
 }
