@@ -3,7 +3,7 @@
 #include <vector>
 #include <regex>
 #include <array>
-//#include "NotImplementedException.h"
+#include <numeric>
 using namespace std;
 
 #include "Day6.h"
@@ -14,46 +14,30 @@ Day6::Day6() {
 }
 
 int Day6::puzzle1() {
-    ifstream ifs(filename, ios::binary);
-    vector<int> lfishs;
-    int number{};
-
-    string strstream;
-    ifs >> strstream;
-    lfishs = std::move(numbersToVector(strstream));
-
-    for (int day = 1; day <= 80; day++) {
-        int newCreation{};
-        for (auto& lfish : lfishs) {
-            lfish--;
-            if (lfish < 0) {
-                lfish = 6;
-                newCreation++;
-            }
-        }
-        lfishs.insert(lfishs.end(), newCreation, 8);
-        cout << day << " : " << lfishs.size() << "\n";
-    }
-
-    return lfishs.size();
+    return solve(80);
 }
 
 int Day6::puzzle2() {
+    long long ret = solve(256);
+    cout << "Day: 6 puzzle2: " << ret << endl;
+    return -1; //warning: bigger than int (the valid answer is the output of this method)
+}
+
+long long Day6::solve(int days)
+{
     ifstream ifs(filename, ios::binary);
     vector<int> lfishsinitial;
-
     string strstream;
     ifs >> strstream;
     lfishsinitial = std::move(numbersToVector(strstream));
 
-    std::array<long long, 9> lfage = {0,0,0,0,0,0,0,0,0};
-    
+    std::array<long long, 9> lfage = { 0,0,0,0,0,0,0,0,0 };
 
     for (auto lfish : lfishsinitial) {
         lfage[lfish]++;
     }
 
-    for (int day = 1; day <= 256; day++) {
+    for (int day = 1; day <= days; day++) {
         std::array<long long, 9> lfageDay = { 0,0,0,0,0,0,0,0,0 };
         lfageDay[6] += lfage[0];
         lfageDay[8] += lfage[0];
@@ -61,16 +45,9 @@ int Day6::puzzle2() {
             lfageDay[age - 1] += lfage[age];
         }
         lfage = lfageDay;
-
-        long long total{};
-        for (int age = 0; age <= 8; age++) {
-            total += lfage[age];
-        }
-
-        cout << "day " << day << " : "  << total << endl;
     }
 
-    return 0;
+    return std::accumulate(lfage.begin(), lfage.end(), (long long)0);
 }
 
 vector<int> Day6::numbersToVector(string str) {

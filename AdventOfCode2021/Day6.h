@@ -7,6 +7,7 @@ public:
     Day6();
     int puzzle1();
     int puzzle2();
+    long long solve(int days);
     vector<int> numbersToVector(string);
 };
 
