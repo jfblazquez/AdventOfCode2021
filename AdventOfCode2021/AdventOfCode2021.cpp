@@ -9,7 +9,7 @@ int main() {
 
 	
 	//Test current day
-	/*Day5 day;
+	/*Dayx day;
 	cout << "Day: " << day.getDay() << " puzzle1: " << day.puzzle1() << "\n";
 	cout << "Day: " << day.getDay() << " puzzle2: " << day.puzzle2() << "\n";	
 	return 0;*/
@@ -19,8 +19,8 @@ int main() {
 		new Day2(),
 		new Day3(),
 		new Day4(),
-		new Day5()/*,
-		new Day6(),
+		new Day5(),
+		new Day6()/*,
 		new Day7(),
 		new Day8(),
 		new Day9(),
