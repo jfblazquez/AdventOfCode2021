@@ -7,5 +7,8 @@ public:
     Day7();
     int puzzle1();
     int puzzle2();
+    int solve(bool basicFuel);
+    int fuelForPos(int pos, bool basicFuel);
+
 };
 
