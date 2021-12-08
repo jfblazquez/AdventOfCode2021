@@ -6,7 +6,6 @@
 #include <exception>
 #include <cmath>
 #include <ctime>
-#include "NotImplementedException.h"
 using namespace std;
 
 #include "Day8.h"
