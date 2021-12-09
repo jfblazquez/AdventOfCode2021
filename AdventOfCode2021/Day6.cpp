@@ -4,6 +4,7 @@
 #include <regex>
 #include <array>
 #include <numeric>
+#include <limits>
 using namespace std;
 
 #include "Day6.h"
@@ -20,7 +21,7 @@ int Day6::puzzle1() {
 int Day6::puzzle2() {
     long long ret = solve(256);
     cout << "Day 6 puzzle 2: " << ret << endl;
-    return -1; //warning: bigger than int (the valid answer is the output of this method)
+    return std::numeric_limits<int>::max(); //warning: bigger than int (the valid answer is the output of this method)
 }
 
 long long Day6::solve(int days)

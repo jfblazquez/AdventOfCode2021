@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <vector>
+#include <limits>
 #include "Calendar.h"
 using namespace std;
 
@@ -42,8 +43,15 @@ int main() {
 		new Day25()*/ };
 	
 	for (auto& elem : calendar)	{
-		cout << "Day " << elem->getDay() << " puzzle 1: " << elem->puzzle1() << "\n";
-		cout << "Day " << elem->getDay() << " puzzle 2: " << elem->puzzle2() << "\n";
+		int p1 = elem->puzzle1();
+		if (std::numeric_limits<int>::max() != p1) {
+			cout << "Day " << elem->getDay() << " puzzle 1: " << p1 << "\n";
+		}
+
+		int p2 = elem->puzzle2();
+		if (std::numeric_limits<int>::max() != p2) {
+			cout << "Day " << elem->getDay() << " puzzle 2: " << p2 << "\n";
+		}
 		delete(elem);
 	}
 }
