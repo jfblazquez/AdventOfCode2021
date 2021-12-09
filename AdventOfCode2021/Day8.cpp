@@ -23,6 +23,7 @@ int Day8::puzzle1() {
 
 	array<int,8> count{ 0,0,0,0,0,0,0,0 };
 	while (getline(ifs, line, '\n')) {
+		if (*(line.end()-1) == '\r') line.erase(line.end() - 1, line.end()); //deal with win format if needed
 		vector<string> v;
 		auto itbegin = std::sregex_token_iterator(line.begin(), line.end(), digit_regex, -1);
 		auto itend = std::sregex_token_iterator();
@@ -70,9 +71,9 @@ int Day8::processLine(vector<string>& lineValues)
 
 	for (int i = 3; i >= 0; i--) {
 		auto result = find(segments.begin(), segments.end(), counter[i]);
-		int pos = result - segments.begin();
+		size_t pos = result - segments.begin();
 		int number = elemToNumber[pos];
-		ret += number * std::pow(10, 3 - i);
+		ret += number * (int)std::pow(10, 3 - i);
 	}
 	return ret;
 }
@@ -104,7 +105,7 @@ vector<int> Day8::bruteForce(vector<string>& inputInit)
 						for (auto f = '1'; f <= '7'; f++) {
 							for (auto g = '1'; g <= '7'; g++) {
 								if (a!= b && a!= c && a != d && a != e && a != f && a != g 
-									&& b != c && b != d && b != e && b != e && b!= f && b != g 
+									&& b != c && b != d && b != e && b!= f && b != g 
 									&& c != d && c != e && c != f && c != g
 									&& d != e && d != f && d != g
 									&& e != f && e != g
@@ -127,7 +128,7 @@ vector<int> Day8::bruteForce(vector<string>& inputInit)
 									if (same == true) {
 										for (auto& segments : input) {
 											auto result = find(original.begin(), original.end(), segments);
-											ret.push_back(result - original.begin());											
+											ret.push_back((int)(result - original.begin()));
 										}
 										return ret;
 									}
