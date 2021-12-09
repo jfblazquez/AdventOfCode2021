@@ -23,6 +23,7 @@ int Day8::puzzle1() {
 
 	array<int,8> count{ 0,0,0,0,0,0,0,0 };
 	while (getline(ifs, line, '\n')) {
+		if (*(line.end()-1) == '\r') line.erase(line.end() - 1, line.end()); //deal with win format if needed
 		vector<string> v;
 		auto itbegin = std::sregex_token_iterator(line.begin(), line.end(), digit_regex, -1);
 		auto itend = std::sregex_token_iterator();
