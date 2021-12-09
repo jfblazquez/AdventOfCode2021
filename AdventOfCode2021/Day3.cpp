@@ -69,11 +69,11 @@ int Day3::locateVal(const vector<int>& vals, bool mostCommonIsOne) {
     vector<int> currentVals{ vals };
     int ret = -1;
     for (int exp = 11; exp >= 0 && ret < 0; exp--) {
-        int elements = currentVals.size();
+        size_t elements = currentVals.size();
         int expVal = 1 << exp;
-        int ones = std::count_if(currentVals.begin(), currentVals.end(),
+        int ones = (int)std::count_if(currentVals.begin(), currentVals.end(),
             [&](int i) {return expVal & i;});
-        int numberKeep = (2 * ones >= elements) ^ !mostCommonIsOne; //When mostCommonIsOne, return 1 when above average. 
+        int numberKeep = (2 * (size_t)ones >= elements) ^ !mostCommonIsOne; //When mostCommonIsOne, return 1 when above average. 
 
         vector<int> temp;
         std::copy_if(currentVals.begin(), currentVals.end(),

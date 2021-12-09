@@ -31,7 +31,7 @@ int Day7::solve(bool basicFuel) {
     }
 
     //hint start average
-    int hMove = std::accumulate(crabs.begin(), crabs.end(), 0) / crabs.size(); 
+    int hMove = std::accumulate(crabs.begin(), crabs.end(), 0) / (int)crabs.size(); 
 
     while (true) {
         int fuel{}, fuelup{}, fueldown{};

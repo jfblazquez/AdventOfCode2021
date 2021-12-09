@@ -60,7 +60,7 @@ void Day4::FillData(vector<int>& drawNumbers, vector<Board>& boards)
     drawNumbers = std::move(numbersToVector(drawNumbersString));
     int numberBoard{};
     int numberIdx{};
-    Board currentBoard;
+    Board currentBoard {};
     while (ifs >> numberBoard) {
         currentBoard.add(numberIdx, numberBoard);
         if (numberIdx == 24) { //create new board
@@ -94,11 +94,10 @@ int Board::unmarked() {
 }
 
 bool Board::bingo() {
-    for (int x = 0; x < 5; x++) {
+    for (size_t x = 0; x < 5; x++) {
         int markedRow = 0;
         int markedCol = 0;
-        for (int y = 0; y < 5; y++) {            
-            int pos = x * 5 + y;
+        for (size_t y = 0; y < 5; y++) {
             if (arrayValues[x * 5 + y] < 0) markedRow++;
             if (arrayValues[x + 5 * y] < 0) markedCol++;
             if (markedRow == 5 || markedCol == 5) return true;
