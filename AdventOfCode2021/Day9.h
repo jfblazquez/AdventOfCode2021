@@ -15,7 +15,9 @@ private:
     array < array<int, CSIZE>, CSIZE> coords;
     int lowPointVal(int x, int y);
     int basin(int x, int y);
-    void Filldata();
+    void filldata();
+    void paintMap(const string& statusText);
 
+    vector < pair<int, int>> lowPoints;
 };
 
