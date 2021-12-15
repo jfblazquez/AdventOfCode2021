@@ -10,14 +10,12 @@ using namespace std;
 
 Day14::Day14() {
     day = 14;
-    filename = "input/testDay14.txt";    
+    filename = "input/Day14.txt";    
 }
 
 int Day14::puzzle1() {
     fillData();
     
-    const clock_t begin_time = clock();
-
     for (int step = 0; step < 10; step++) {
         iPolymer = polymerize();
     }
@@ -25,11 +23,51 @@ int Day14::puzzle1() {
     for (auto c : iPolymer) {
         elemsV[c]++;
     }
-    std::cout << endl << "Elapsed(p1): " << float(clock() - begin_time) / CLOCKS_PER_SEC << endl;
     return (int)result();    
 }
 
+//read hint: a pair, create two new pairs (and remove the old one)
+//Count: Read first letter of each pair and add the las letter from te original one
 int Day14::puzzle2() {
+    fillData();
+
+    const clock_t begin_time = clock();
+
+    auto endLoop = iPolymer.size() - 1;
+    for (auto i = 0; i < endLoop; i++) {
+        string s = iPolymer.substr(i, 2);
+        pairs[s]++;
+    }
+
+    for (int step = 0; step < 40; step++) {
+        map<string, long long> newStepPairs;
+        for (auto& c : pairs) {
+            auto result = iRules[c.first];
+            auto count = c.second;
+            auto newPair1 = result.substr(0, 2);
+            auto newPair2 = result.substr(1, 2);
+            newStepPairs[newPair1] += count;
+            newStepPairs[newPair2] += count;
+        }
+        pairs = newStepPairs;        
+    }
+
+
+    for (auto& c : pairs) {
+        elemsV[c.first[0]]+=c.second;
+        elemsDebug[c.first[0]]+=c.second;
+    }
+    elemsV[iPolymer[iPolymer.size() - 1]]++;
+    elemsDebug[iPolymer[iPolymer.size() - 1]]++;
+
+
+    //std::cout << endl << "Elapsed(p2): " << float(clock() - begin_time) / CLOCKS_PER_SEC << endl;
+    cout << "Day 14 puzzle 2: " << result() << endl;
+    return numeric_limits<int>::max();
+}
+
+//slow solution
+/*int Day14::puzzle2() {
     fillData();
 
     const clock_t begin_time = clock();
@@ -45,7 +83,8 @@ int Day14::puzzle2() {
     std::cout << endl << "Elapsed(p2): " << float(clock() - begin_time) / CLOCKS_PER_SEC << endl;
     cout << "Day 14 puzzle 2: " << result() << endl;
     return numeric_limits<int>::max();
-}
+}*/
+
 
 long long Day14::result()
 {
@@ -108,8 +147,6 @@ void Day14::polymerizeComplex(string input, int steps)
         }
     }
 }
-
-
 
 void Day14::fillData()
 {

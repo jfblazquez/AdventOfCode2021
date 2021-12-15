@@ -19,10 +19,11 @@ private:
     string polymerize();
     void polymerizeComplex(string, int);
 
-    map<string, string> iRules;
-    map<char*, char> iRulesC;
+    map<string, string> iRules;    
+    map<char, long long> elemsDebug;
     vector<long long> elemsV;
     string iPolymer;
+    map<string, long long> pairs;
 
 };
 
