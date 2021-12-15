@@ -10,10 +10,10 @@ int main() {
 
 	
 	//Test current day
-	/*Day1x day;
+	Day1x day;
 	cout << "Day: " << day.getDay() << " puzzle1: " << day.puzzle1() << "\n";
 	cout << "Day: " << day.getDay() << " puzzle2: " << day.puzzle2() << "\n";	
-	return 0;*/
+	return 0;
 	
 	vector<BaseDay*> calendar{ 
 		new Day1(),
@@ -28,9 +28,9 @@ int main() {
 		new Day10(),
 		new Day11(),
 		new Day12(),
-		new Day13()/*,
+		new Day13(),
 		new Day14(),
-		new Day15(),
+		new Day15()/*,
 		new Day16(),
 		new Day17(),
 		new Day18(),
