@@ -5,7 +5,6 @@
 #include <vector>
 #include <sstream>
 #include <cassert>
-#include "NotImplementedException.h"
 using namespace std;
 
 #include "Day18.h"
@@ -17,6 +16,7 @@ Day18::Day18() {
 
 int Day18::puzzle1() {
 
+    //TODO: Clean memory
     testCases();
 
     ifstream ifs(filename, ios::binary);
@@ -87,8 +87,7 @@ int Day18::puzzle2() {
 
 }
 
-Group* Group::generateGroup(string exp)
-{
+Group* Group::generateGroup(string exp) {
     string number;
     Group* gc{};
 
@@ -128,8 +127,7 @@ Group* Group::generateGroup(string exp)
 }
 
 
-void Day18::testCases()
-{
+void Day18::testCases() {
     //Check read
     string exp = "[[6,[5,[4,[3,2]]]],1]";
     string result = "[[6,[5,[4,[3,2]]]],1]";
@@ -196,22 +194,6 @@ void Day18::testCases()
     while (group->reduce());
     assert(magnitude == group->magnitude());
 
-    //test testday18.3
-    //test9
-    //verbose
-    /*exp = "[[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]";
-    result = "[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]";
-    group = generateGroup(exp);
-    cout << endl << "orig: " <<group->print() << endl;
-    cout << "orig: " << group->printLevel() << endl;
-    cout << "expe: " << result << endl;
-    while (group->reduce(1)) {
-        cout << group->print() << endl;
-        cout << group->printLevel() << endl;
-    }
-    cout << endl << group->print() << endl;
-    assert(result == group->print());*/
-
     //test 9
     exp = "[[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]";
     result = "[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]";
@@ -269,44 +251,28 @@ void Day18::testCases()
     while (group->reduce());
     assert(result == group->print());
     assert(magnitude == group->magnitude());
-
-    
-    /*//test
-    exp = "[,]";
-    result = "";
-    group = Group::generateGroup(exp);
-    while (group->reduce());
-    assert(result == group->print());*/
 }
 
-bool Group::isLeft()
-{
+bool Group::isLeft() {
     return parent && parent->groupL == this;
 }
 
-bool Group::isRight()
-{
+bool Group::isRight() {
     return parent && parent->groupR == this;
-}
-
-void Group::sum(int val, bool left)
-{
 }
 
 bool Group::isLeftEmpty() {
     return regularL == NOVAL && nullptr == groupL;
 }
 
-int Group::magnitude()
-{
+int Group::magnitude() {
     int mL = regularL == NOVAL ? groupL->magnitude() :  regularL;
     int mR = regularR == NOVAL ? groupR->magnitude() : regularR;
     int m = (3 * mL) + (2 * mR);
     return m;
 }
 
-string Group::print()
-{
+string Group::print() {
     stringstream s;
     s << '[';
     if (groupL) {
@@ -326,8 +292,7 @@ string Group::print()
     return string(s.str());
 }
 
-string Group::printLevel(int level)
-{
+string Group::printLevel(int level) {
     stringstream s;
     s << level;
     if (groupL) {

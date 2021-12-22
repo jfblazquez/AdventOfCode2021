@@ -25,7 +25,6 @@ public:
     
     int regularL{ NOVAL };
     int regularR{ NOVAL };
-    void sum(int val, bool left);
 
     bool isLeftEmpty();
     bool reduce(bool verbose = false);
