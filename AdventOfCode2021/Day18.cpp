@@ -28,13 +28,6 @@ int Day18::puzzle1() {
         groupsToSum.push_back(group);
     }
 
-    //test
-    int i = 1;
-    for (auto& g : groupsToSum) {
-        while (g->reduce());
-        i++;
-    }
-
     //sum
     Group* result = groupsToSum[0];
     for (int i = 1; i < groupsToSum.size(); i++) {
@@ -53,13 +46,6 @@ int Day18::puzzle2() {
         Group* group = Group::generateGroup(exp);
         assert(exp == group->print());
         groupsToSum.push_back(group);
-    }
-
-    //reduce Init
-    int i = 1;
-    for (auto& g : groupsToSum) {
-        while (g->reduce());
-        i++;
     }
 
     int maxMagnitude = 0;
