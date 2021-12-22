@@ -8,7 +8,9 @@ public:
 
 
     Group(Group* g) : parent(g) {};
-    Group(Group* gL, Group* gR) : groupL{ gL }, groupR{ gR } {
+    Group(Group* gL, Group* gR) : 
+        groupL{ generateGroup(gL->print()) },
+        groupR{ generateGroup(gR->print()) } {
         groupL->parent = this;
         groupR->parent = this;
     };
@@ -32,7 +34,7 @@ public:
     int magnitude();
     string print();
     string printLevel(int level = 1);
-
+    static Group* generateGroup(string exp);
 };
 
 class Day18 : 
@@ -43,6 +45,6 @@ public:
     int puzzle2();
     void testCases();
 private:
-    Group* generateGroup(string exp);
+
 };
 
