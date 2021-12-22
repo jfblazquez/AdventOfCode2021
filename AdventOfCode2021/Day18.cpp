@@ -12,7 +12,7 @@ using namespace std;
 
 Day18::Day18() {
     day = 18;
-    filename = "input/testDay18.3.txt";
+    filename = "input/Day18.txt";
 }
 
 int Day18::puzzle1() {
