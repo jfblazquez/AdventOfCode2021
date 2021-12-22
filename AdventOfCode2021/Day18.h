@@ -26,9 +26,12 @@ public:
     void sum(int val, bool left);
 
     bool isLeftEmpty();
-    bool reduce(int depth);
+    bool reduce();
+    bool explode(int depth);
+    bool split(int depth);
     int magnitude();
     string print();
+    string printLevel(int level = 1);
 
 };
 

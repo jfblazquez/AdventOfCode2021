@@ -31,7 +31,7 @@ int Day18::puzzle1() {
     //test
     int i = 1;
     for (auto& g : groupsToSum) {
-        while (g->reduce(1));
+        while (g->reduce());
         i++;
     }
 
@@ -39,8 +39,10 @@ int Day18::puzzle1() {
     Group* result = groupsToSum[0];
     for (int i = 1; i < groupsToSum.size(); i++) {
         result = new Group(result, groupsToSum[i]);
-        while (result->reduce(1));
+        while (result->reduce());
+        cout << result->print() << endl;
     }
+    cout << "Finish result: " << endl;
     cout << result->print() << endl;
     return result->magnitude();
 }
@@ -103,42 +105,42 @@ void Day18::testCases()
     exp = "[[[[[9,8],1],2],3],4]";
     result = "[[[[0,9],2],3],4]";
     group = generateGroup(exp);
-    while (group->reduce(1));
+    while (group->reduce());
     assert(result == group->print());
 
     //test 2
     exp = "[7,[6,[5,[4,[3,2]]]]]";
     result = "[7,[6,[5,[7,0]]]]";
     group = generateGroup(exp);
-    while (group->reduce(1));
+    while (group->reduce());
     assert(result == group->print());
 
     //test 3
     exp = "[[6,[5,[4,[3,2]]]],1]";
     result = "[[6,[5,[7,0]]],3]";
     group = generateGroup(exp);
-    while (group->reduce(1));
+    while (group->reduce());
     assert(result == group->print());
 
     //test 4
     exp = "[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]";
     result = "[[3,[2,[8,0]]],[9,[5,[7,0]]]]";
     group = generateGroup(exp);
-    while (group->reduce(1));
+    while (group->reduce());
     assert(result == group->print());
 
     //test 5
     exp = "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]";
     result = "[[3,[2,[8,0]]],[9,[5,[7,0]]]]";
     group = generateGroup(exp);
-    while (group->reduce(1));
+    while (group->reduce());
     assert(result == group->print());
 
     //test 6
     exp = "[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]";
     result = "[[[[0,7],4],[[7,8],[6,0]]],[8,1]]";
     group = generateGroup(exp);
-    while (group->reduce(1)); /*{
+    while (group->reduce()); /*{
         cout << group->print() << endl;
     }*/
     assert(result == group->print());
@@ -148,25 +150,49 @@ void Day18::testCases()
     exp = "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]";
     int magnitude = 3488;
     group = generateGroup(exp);
-    while (group->reduce(1));
+    while (group->reduce());
     assert(magnitude == group->magnitude());
 
     //test8
     exp = "[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]";
     magnitude = 4140;
     group = generateGroup(exp);
-    while (group->reduce(1));
+    while (group->reduce());
     assert(magnitude == group->magnitude());
 
     //test testday18.3
     //test9
-    exp = "[[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]";
+    //verbose
+    /*exp = "[[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]";
     result = "[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]";
     group = generateGroup(exp);
     cout << endl << "orig: " <<group->print() << endl;
-    cout << endl << "expe: " << result << endl;
+    cout << "orig: " << group->printLevel() << endl;
+    cout << "expe: " << result << endl;
     while (group->reduce(1)) {
         cout << group->print() << endl;
+        cout << group->printLevel() << endl;
+    }
+    cout << endl << group->print() << endl;
+    assert(result == group->print());*/
+
+    //test9
+    exp = "[[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]";
+    result = "[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]";
+    group = generateGroup(exp);
+    while (group->reduce());
+    assert(result == group->print());        
+
+    //test11
+    exp = "[[[[[7,0],[7,7]],[[7,7],[7,8]]],[[[7,7],[8,8]],[[7,7],[8,7]]]],[7,[5,[[3,8],[1,4]]]]]";
+    result = "[[[[7,7],[7,8]],[[9,5],[8,7]]],[[[6,8],[0,8]],[[9,9],[9,0]]]]";
+    group = generateGroup(exp);
+    cout << endl << "orig: " << group->print() << endl;
+    cout << "orig: " << group->printLevel() << endl;
+    cout << "expe: " << result << endl;
+    while (group->reduce()) {
+        cout << group->print() << endl;
+        cout << group->printLevel() << endl;
     }
     cout << endl << group->print() << endl;
     assert(result == group->print());
@@ -220,8 +246,42 @@ string Group::print()
     return string(s.str());
 }
 
-bool Group::reduce(int depth)
+string Group::printLevel(int level)
 {
+    stringstream s;
+    s << level;
+    if (groupL) {
+        s << groupL->printLevel(level + 1);
+    }
+    else {
+        s << ' ';
+        if (regularL >= 10) s << ' ';
+        if (regularL >= 100) s << ' ';
+        if (regularL >= 1000) s << ' ';
+    }
+    s << ',';
+    if (groupR) {
+        s << groupR->printLevel(level + 1);
+    }
+    else {
+        s << ' ';
+        if (regularR >= 10) s << ' ';
+        if (regularR >= 100) s << ' ';
+        if (regularR >= 1000) s << ' ';
+    }
+    s << level;
+    return string(s.str());
+}
+
+bool Group::reduce() {
+    bool ret = explode(1);
+    if (!ret) {
+        ret = split(1);
+    }
+    return ret;
+}
+
+bool Group::explode(int depth) {
     bool ret = false;
     if (depth > 4) {
         assert(nullptr == groupL);
@@ -324,17 +384,21 @@ bool Group::reduce(int depth)
             parent->regularR = 0;
             delete this;
         }
-            
+
         ret = true;
     }
     if (!ret && groupL) {
-        ret = groupL->reduce(depth + 1);
+        ret = groupL->explode(depth + 1);
     }
     if (!ret && groupR) {
-        ret = groupR->reduce(depth + 1);
+        ret = groupR->explode(depth + 1);
     }
 
+    return ret;
+}
 
+bool Group::split(int depth) {
+    bool ret = false;
     if (!ret && regularL != NOVAL && regularL >= 10) {
         ret = true;
         groupL = new Group(regularL >> 1, (regularL >> 1) + (regularL % 2), this);
@@ -347,6 +411,12 @@ bool Group::reduce(int depth)
         regularR = NOVAL;
     }
 
-    return ret;
+    if (!ret && groupL) {
+        ret = groupL->split(depth + 1);
+    }
+    if (!ret && groupR) {
+        ret = groupR->split(depth + 1);
+    }
 
+    return ret;
 }
