@@ -187,10 +187,7 @@ void Day18::testCases()
     exp = "[[[[[7,0],[7,7]],[[7,7],[7,8]]],[[[7,7],[8,8]],[[7,7],[8,7]]]],[7,[5,[[3,8],[1,4]]]]]";
     result = "[[[[7,7],[7,8]],[[9,5],[8,7]]],[[[6,8],[0,8]],[[9,9],[9,0]]]]";
     group = generateGroup(exp);
-    cout << endl << "orig: " << group->print() << endl;
-    cout << "orig: " << group->printLevel() << endl;
-    cout << "expe: " << result << endl;
-    while (group->reduce(true));
+    while (group->reduce());
     cout << endl << group->print() << endl;
     assert(result == group->print());
 
@@ -208,26 +205,26 @@ void Day18::testCases()
     while (group->reduce());
     assert(result == group->print());
 
-    //test14 (fails)
+    //test14
     exp = "[[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]],[1,[[[9,3],9],[[9,0],[0,7]]]]]";
     result = "[[[[7,8],[6,7]],[[6,8],[0,8]]],[[[7,7],[5,0]],[[5,5],[5,6]]]]";
     group = generateGroup(exp);
     while (group->reduce());
     assert(result == group->print());
 
-    //test15 (fails)
+    //test15
     exp = "[[[[[7,8],[6,7]],[[6,8],[0,8]]],[[[7,7],[5,0]],[[5,5],[5,6]]]],[[[5,[7,4]],7],1]]";
     result = "[[[[7,7],[7,7]],[[8,7],[8,7]]],[[[7,0],[7,7]],9]]";
     group = generateGroup(exp);
     while (group->reduce());
     assert(result == group->print());
 
-    //test16 (fails)
+    //test16
     exp = "[[[[[7,7],[7,7]],[[8,7],[8,7]]],[[[7,0],[7,7]],9]],[[[[4,2],2],6],[8,7]]]";
     result = "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]";
     group = generateGroup(exp);
     while (group->reduce());
-    //assert(result == group->print());
+    assert(result == group->print());
 
     /*//test
     exp = "[,]";
@@ -462,15 +459,16 @@ bool Group::split(int depth) {
         regularL = NOVAL;
     }
 
+    if (!ret && groupL) {
+        ret = groupL->split(depth + 1);
+    }
+
     if (!ret && regularR != NOVAL && regularR >= 10) {
         ret = true;
         groupR = new Group(regularR >> 1, (regularR >> 1) + (regularR % 2), this);
         regularR = NOVAL;
     }
 
-    if (!ret && groupL) {
-        ret = groupL->split(depth + 1);
-    }
     if (!ret && groupR) {
         ret = groupR->split(depth + 1);
     }
