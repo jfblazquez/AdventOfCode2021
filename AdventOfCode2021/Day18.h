@@ -26,7 +26,7 @@ public:
     void sum(int val, bool left);
 
     bool isLeftEmpty();
-    bool reduce();
+    bool reduce(bool verbose = false);
     bool explode(int depth);
     bool split(int depth);
     int magnitude();

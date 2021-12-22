@@ -183,20 +183,58 @@ void Day18::testCases()
     while (group->reduce());
     assert(result == group->print());        
 
-    //test11
+    //test11 (fails)
     exp = "[[[[[7,0],[7,7]],[[7,7],[7,8]]],[[[7,7],[8,8]],[[7,7],[8,7]]]],[7,[5,[[3,8],[1,4]]]]]";
     result = "[[[[7,7],[7,8]],[[9,5],[8,7]]],[[[6,8],[0,8]],[[9,9],[9,0]]]]";
     group = generateGroup(exp);
     cout << endl << "orig: " << group->print() << endl;
     cout << "orig: " << group->printLevel() << endl;
     cout << "expe: " << result << endl;
-    while (group->reduce()) {
-        cout << group->print() << endl;
-        cout << group->printLevel() << endl;
-    }
+    while (group->reduce(true));
     cout << endl << group->print() << endl;
     assert(result == group->print());
 
+    //test12
+    exp = "[[[[[7,7],[7,8]],[[9,5],[8,7]]],[[[6,8],[0,8]],[[9,9],[9,0]]]],[[2,[2,2]],[8,[8,1]]]]";
+    result = "[[[[6,6],[6,6]],[[6,0],[6,7]]],[[[7,7],[8,9]],[8,[8,1]]]]";
+    group = generateGroup(exp);
+    while (group->reduce());
+    assert(result == group->print());
+
+    //test13
+    exp = "[[[[[6,6],[6,6]],[[6,0],[6,7]]],[[[7,7],[8,9]],[8,[8,1]]]],[2,9]]";
+    result = "[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]]";
+    group = generateGroup(exp);
+    while (group->reduce());
+    assert(result == group->print());
+
+    //test14 (fails)
+    exp = "[[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]],[1,[[[9,3],9],[[9,0],[0,7]]]]]";
+    result = "[[[[7,8],[6,7]],[[6,8],[0,8]]],[[[7,7],[5,0]],[[5,5],[5,6]]]]";
+    group = generateGroup(exp);
+    while (group->reduce());
+    assert(result == group->print());
+
+    //test15 (fails)
+    exp = "[[[[[7,8],[6,7]],[[6,8],[0,8]]],[[[7,7],[5,0]],[[5,5],[5,6]]]],[[[5,[7,4]],7],1]]";
+    result = "[[[[7,7],[7,7]],[[8,7],[8,7]]],[[[7,0],[7,7]],9]]";
+    group = generateGroup(exp);
+    while (group->reduce());
+    assert(result == group->print());
+
+    //test16 (fails)
+    exp = "[[[[[7,7],[7,7]],[[8,7],[8,7]]],[[[7,0],[7,7]],9]],[[[[4,2],2],6],[8,7]]]";
+    result = "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]";
+    group = generateGroup(exp);
+    while (group->reduce());
+    //assert(result == group->print());
+
+    /*//test
+    exp = "[,]";
+    result = "";
+    group = generateGroup(exp);
+    while (group->reduce());
+    assert(result == group->print());*/
 }
 
 bool Group::isLeft()
@@ -273,11 +311,30 @@ string Group::printLevel(int level)
     return string(s.str());
 }
 
-bool Group::reduce() {
+bool Group::reduce(bool verbose) {
+    string originalLevels = printLevel();
+    bool isExplode = false;
+    bool isSplit = false;
     bool ret = explode(1);
+    isExplode = ret;
+        
     if (!ret) {
         ret = split(1);
+        isSplit = ret;
     }
+    if (ret && verbose)
+    {
+        cout << print();
+        if (isExplode) {
+            cout << "   (explode)" << endl;
+        }
+        if (isSplit) {
+            cout << "   (split)" << endl;   
+            assert(originalLevels.find('5') == string::npos);
+        }
+        cout << printLevel() << endl;        
+    }
+
     return ret;
 }
 
