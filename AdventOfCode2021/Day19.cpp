@@ -43,6 +43,7 @@ void Day19::fillData() {
     }
     currentScan.setStatus(0);
     scanners.push_back(currentScan);
+    scanners[0].hasRelative = true;
 }
 bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativePos)
 {
@@ -59,7 +60,8 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
         [](auto& p1, auto& p2) {
             return p1.second < p2.second; });
 
-    bool overlapX = x->second >= 12;
+    int maxOverlapX = x->second;
+    bool overlapX = maxOverlapX >= 12;
     relativePos.p1 = x->first;
 
     histogramDiff.clear();
@@ -75,7 +77,8 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
         [](auto& p1, auto& p2) {
             return p1.second < p2.second; });
 
-    bool overlapY = y->second >= 12;
+    int maxOverlapY = y->second;
+    bool overlapY = maxOverlapY >= 12;
     relativePos.p2 = y->first;
 
     histogramDiff.clear();
@@ -91,34 +94,49 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
         [](auto& p1, auto& p2) {
             return p1.second < p2.second; });
 
-    bool overlapZ = z->second >= 12;
+    int maxOverlapZ = z->second;
+    bool overlapZ = maxOverlapZ >= 12;
     relativePos.p3 = z->first;
 
     return overlapX && overlapY && overlapZ;
 }
-void Day19::setRelativePosition(Scanner& stationaryScanner, Scanner& unknownScanner)
+bool Day19::setRelativePosition(Scanner& stationaryScanner, Scanner& unknownScanner)
 {
     int status = 0;
     bool done = false;
-    while (status < 8 && !done) {
+    while (status < 24 && !done) {
         unknownScanner.setStatus(status);
         Points relativePos(0,0,0);
         done = hasOverlapping(stationaryScanner, unknownScanner, relativePos);
         if (done) {
-            unknownScanner.setRelativePos(relativePos);
+            unknownScanner.setRelativePos(stationaryScanner.getRelativePos() + relativePos);
         }
         else
         {
             status++;
         }
     }
+    return done;
 }
 
 int Day19::puzzle1() {
     fillData();
-    setRelativePosition(scanners[0], scanners[1]);
-    setRelativePosition(scanners[1], scanners[4]);
 
+    auto sizeScanners = scanners.size();
+    for (auto s1idx = 0; s1idx < sizeScanners; s1idx++) {
+        for (auto s2idx = 0; s2idx < sizeScanners; s2idx++) {
+            auto& s1 = scanners[s1idx];
+            auto& s2 = scanners[s2idx];
+            if (s1.number != s2.number && s1.hasRelative && !s2.hasRelative) {
+                bool newRelative = setRelativePosition(s1, s2);
+                if (newRelative) {
+                    s1idx = 0;
+                    s2idx = 0;
+                }
+            }
+        }
+    }
+    
     return 0;
 }
 
@@ -135,12 +153,37 @@ void Scanner::setStatus(int newStatus)
 {
     if (newStatus == status) return;
     // bit lsf to msf 
-    // 12345678
+    // 12345678     
     // xyz-----
     status = newStatus;
     pointsStatus.clear();
     for (auto& origPoint : points) {
-        Points np(origPoint.p1, origPoint.p2, origPoint.p3);
+        int x, y, z;
+        //Points np(origPoint.p1, origPoint.p2, origPoint.p3);
+        if ((status & 24) == 0) {
+            x = origPoint.p1;
+            y = origPoint.p2;
+            z = origPoint.p3;
+        }
+        else if ((status & 24) == 8) {
+            //xyz -> yzx
+            x = origPoint.p2;
+            y = origPoint.p3;
+            z = origPoint.p1;
+        }
+        else if ((status & 24) == 16) {
+            //xyz -> zxy
+            x = origPoint.p3;
+            y = origPoint.p1;
+            z = origPoint.p2;
+        }
+        else {
+            cout << "NVV" << endl;
+            throw(status);
+        }
+
+        Points np(x,y,z);
+
         if (status & 1) {
             np.p1 *= -1;
         }
@@ -156,6 +199,7 @@ void Scanner::setStatus(int newStatus)
 
 void Scanner::setRelativePos(Points newRelativePos)
 {
+    hasRelative = true;
     relativePos = newRelativePos;
     pointsRelative.clear();
     for (auto& statusPoint : pointsStatus) {
@@ -164,4 +208,14 @@ void Scanner::setRelativePos(Points newRelativePos)
             statusPoint.p2 + relativePos.p2, 
             statusPoint.p3 + relativePos.p3));
     }
+}
+
+const Points& Scanner::getRelativePos()
+{
+    return relativePos;
+}
+
+Points Points::operator+(const Points& other) const
+{
+    return Points(p1 + other.p1,p2 + other.p2, p3 + other.p3);
 }

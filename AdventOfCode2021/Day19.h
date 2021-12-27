@@ -6,6 +6,7 @@ class Points {
 public:
     int p1{}, p2{}, p3{};
     Points(int cp1, int cp2, int cp3) : p1{ cp1 }, p2{ cp2 }, p3{ cp3 }{};
+    Points operator+(const Points& other) const;
 };
 
 class Scanner {
@@ -18,9 +19,12 @@ public:
     int getStatus();
     void setStatus(int newStatus);
     void setRelativePos(Points newRelativePos);
+    const Points& getRelativePos();
+    bool hasRelative{ false };
+
 private:
     int status{-1};
-    Points relativePos{ -1,-1,-1 };
+    Points relativePos{ 0,0,0 };
 };
 
 
@@ -33,7 +37,7 @@ public:
 private:
     void fillData();
     bool hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativePos);
-    void setRelativePosition(Scanner& stationaryScanner, Scanner& unknownScanner);
+    bool setRelativePosition(Scanner& stationaryScanner, Scanner& unknownScanner);
 
     vector<Scanner> scanners;
 
