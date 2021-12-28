@@ -6,7 +6,6 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include "NotImplementedException.h"
 using namespace std;
 
 #include "Day19.h"
@@ -14,6 +13,54 @@ using namespace std;
 Day19::Day19() {
     day = 19;
     filename = "input/testDay19.txt";
+}
+
+int Day19::puzzle1() {
+    fillData();
+
+    int relatives = 1;
+    auto sizeScanners = scanners.size();
+    for (auto s1idx = 0; s1idx < sizeScanners; s1idx++) {
+        for (auto s2idx = 0; s2idx < sizeScanners; s2idx++) {
+            auto& s1 = scanners[s1idx];
+            auto& s2 = scanners[s2idx];
+            if (s1.number != s2.number && s1.hasRelative && !s2.hasRelative) {
+                bool newRelative = setRelativePosition(s1, s2);
+                if (newRelative) {
+                    relatives++;
+                    //cout << "relatives: " << relatives << endl;
+                    s1idx = 0;
+                    s2idx = 0;
+                }
+            }
+        }
+    }
+
+    set<Points> allPoints;
+    for (auto& s : scanners) {
+        for (Points& p : s.pointsRelative) {
+            allPoints.insert(p);
+        }
+    }
+
+    return allPoints.size();
+}
+
+int Day19::puzzle2() {
+    if (scanners.size() == 0) puzzle1();
+    int maxManhattan = 0;
+    for (auto& s1 : scanners) {
+        for (auto& s2 : scanners) {
+            if (s1.number != s2.number) {
+                int cManhattan = manhattan(s1.getRelativePos(), s2.getRelativePos());
+                if (cManhattan > maxManhattan) {
+                    maxManhattan = cManhattan;
+                }
+            }
+        }
+    }
+
+    return maxManhattan;
 }
 
 void Day19::fillData() {
@@ -25,7 +72,7 @@ void Day19::fillData() {
     int scannerNumber = -1;
     while (getline(ifs, line))
     {
-        if (line.substr(0,2) == "--") { //[0] == '-' fails with -\d
+        if (line.substr(0, 2) == "--") { //[0] == '-' fails with -\d
             if (currentScan.number >= 0) {
                 currentScan.setStatus(0);
                 scanners.push_back(currentScan);
@@ -43,10 +90,10 @@ void Day19::fillData() {
     }
     currentScan.setStatus(0);
     scanners.push_back(currentScan);
-    scanners[0].hasRelative = true;
+    scanners[0].setRelativePos(Points(0, 0, 0));
 }
-bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativePos)
-{
+
+bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativePos) {
     map<int, int> histogramDiff;
 
     for (auto& s1point : scanner1.pointsStatus) {
@@ -56,7 +103,7 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
         }
     }
 
-    map<int,int>::iterator x = std::max_element(histogramDiff.begin(), histogramDiff.end(),
+    map<int, int>::iterator x = std::max_element(histogramDiff.begin(), histogramDiff.end(),
         [](auto& p1, auto& p2) {
             return p1.second < p2.second; });
 
@@ -100,13 +147,12 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
 
     return overlapX && overlapY && overlapZ;
 }
-bool Day19::setRelativePosition(Scanner& stationaryScanner, Scanner& unknownScanner)
-{
+bool Day19::setRelativePosition(Scanner& stationaryScanner, Scanner& unknownScanner) {
     int status = 0;
     bool done = false;
-    while (status < 24 && !done) {
+    while (status < 48 && !done) {
         unknownScanner.setStatus(status);
-        Points relativePos(0,0,0);
+        Points relativePos(0, 0, 0);
         done = hasOverlapping(stationaryScanner, unknownScanner, relativePos);
         if (done) {
             unknownScanner.setRelativePos(stationaryScanner.getRelativePos() + relativePos);
@@ -119,63 +165,53 @@ bool Day19::setRelativePosition(Scanner& stationaryScanner, Scanner& unknownScan
     return done;
 }
 
-int Day19::puzzle1() {
-    fillData();
-
-    auto sizeScanners = scanners.size();
-    for (auto s1idx = 0; s1idx < sizeScanners; s1idx++) {
-        for (auto s2idx = 0; s2idx < sizeScanners; s2idx++) {
-            auto& s1 = scanners[s1idx];
-            auto& s2 = scanners[s2idx];
-            if (s1.number != s2.number && s1.hasRelative && !s2.hasRelative) {
-                bool newRelative = setRelativePosition(s1, s2);
-                if (newRelative) {
-                    s1idx = 0;
-                    s2idx = 0;
-                }
-            }
-        }
-    }
-    
-    return 0;
+int Day19::manhattan(const Points& p1, const Points& p2) {
+    int m1 = (int)abs(p1.p1 - p2.p1);
+    int m2 = (int)abs(p1.p2 - p2.p2);
+    int m3 = (int)abs(p1.p3 - p2.p3);
+    return m1 + m2 + m3;
 }
 
-int Day19::puzzle2() {
-    throw NotImplementedException();
-}
-
-int Scanner::getStatus()
-{
-    return status;
-}
-
-void Scanner::setStatus(int newStatus)
-{
+void Scanner::setStatus(int newStatus) {
     if (newStatus == status) return;
-    // bit lsf to msf 
-    // 12345678     
-    // xyz-----
     status = newStatus;
     pointsStatus.clear();
     for (auto& origPoint : points) {
         int x, y, z;
-        //Points np(origPoint.p1, origPoint.p2, origPoint.p3);
-        if ((status & 24) == 0) {
+        if ((status & 56) == 0) {
             x = origPoint.p1;
             y = origPoint.p2;
             z = origPoint.p3;
         }
-        else if ((status & 24) == 8) {
+        else if ((status & 56) == 8) {
+            //xyz ->  xzy
+            x = origPoint.p1;
+            y = origPoint.p3;
+            z = origPoint.p2;
+        }
+        else if ((status & 56) == 16) {
+            //xyz -> yxz
+            x = origPoint.p2;
+            y = origPoint.p1;
+            z = origPoint.p3;
+        }
+        else if ((status & 56) == 24) {
             //xyz -> yzx
             x = origPoint.p2;
             y = origPoint.p3;
             z = origPoint.p1;
         }
-        else if ((status & 24) == 16) {
+        else if ((status & 56) == 32) {
             //xyz -> zxy
             x = origPoint.p3;
             y = origPoint.p1;
             z = origPoint.p2;
+        }
+        else if ((status & 56) == 40) {
+            //xyz -> zyx
+            x = origPoint.p3;
+            y = origPoint.p2;
+            z = origPoint.p1;
         }
         else {
             cout << "NVV" << endl;
@@ -197,8 +233,7 @@ void Scanner::setStatus(int newStatus)
     }
 }
 
-void Scanner::setRelativePos(Points newRelativePos)
-{
+void Scanner::setRelativePos(Points newRelativePos) {
     hasRelative = true;
     relativePos = newRelativePos;
     pointsRelative.clear();
@@ -210,12 +245,16 @@ void Scanner::setRelativePos(Points newRelativePos)
     }
 }
 
-const Points& Scanner::getRelativePos()
-{
+const Points& Scanner::getRelativePos() {
     return relativePos;
 }
 
-Points Points::operator+(const Points& other) const
-{
+Points Points::operator+(const Points& other) const {
     return Points(p1 + other.p1,p2 + other.p2, p3 + other.p3);
+}
+
+bool Points::operator<(const Points& other) const {
+    return p1 < other.p1 || 
+        (p1 == other.p1 && p2 < other.p2) || 
+        (p1 == other.p1 && p2 == other.p2 && p3 < other.p3);
 }
