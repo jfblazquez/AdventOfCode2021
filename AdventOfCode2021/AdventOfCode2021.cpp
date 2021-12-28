@@ -10,10 +10,12 @@ int main() {
 
 	
 	//Test current day
-	/*Day19 day;
+	const clock_t begin_time = clock();
+	Day19 day;
 	cout << "Day: " << day.getDay() << " puzzle1: " << day.puzzle1() << "\n";
 	cout << "Day: " << day.getDay() << " puzzle2: " << day.puzzle2() << "\n";	
-	return 0;*/
+	std::cout << endl << "Elapsed(p2): " << float(clock() - begin_time) / CLOCKS_PER_SEC << endl;
+	return 0;
 	
 	vector<BaseDay*> calendar{ 
 		new Day1(),
