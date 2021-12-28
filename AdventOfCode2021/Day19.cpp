@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <algorithm>
 #include <set>
 #include <sstream>
@@ -94,7 +94,7 @@ void Day19::fillData() {
 }
 
 bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativePos) {
-    map<int, int> histogramDiff;
+    unordered_map<int, int> histogramDiff;
 
     for (auto& s1point : scanner1.pointsStatus) {
         for (auto& s2point : scanner2.pointsStatus) {
@@ -108,7 +108,7 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
 
     endOfLoopP1:
 
-    map<int, int>::iterator x = std::max_element(histogramDiff.begin(), histogramDiff.end(),
+    auto x = std::max_element(histogramDiff.begin(), histogramDiff.end(),
         [](auto& p1, auto& p2) {
             return p1.second < p2.second; });
 
