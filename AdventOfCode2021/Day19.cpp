@@ -150,7 +150,7 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
 bool Day19::setRelativePosition(Scanner& stationaryScanner, Scanner& unknownScanner) {
     int status = 0;
     bool done = false;
-    while (status < 48 && !done) {
+    while (status < 24 && !done) {
         unknownScanner.setStatus(status);
         Points relativePos(0, 0, 0);
         done = hasOverlapping(stationaryScanner, unknownScanner, relativePos);
@@ -178,57 +178,135 @@ void Scanner::setStatus(int newStatus) {
     pointsStatus.clear();
     for (auto& origPoint : points) {
         int x, y, z;
-        if ((status & 56) == 0) {
+        switch (status) {
+        case 0:
             x = origPoint.p1;
             y = origPoint.p2;
             z = origPoint.p3;
-        }
-        else if ((status & 56) == 8) {
-            //xyz ->  xzy
+            break;
+        case 1:
+            x = origPoint.p1;
+            y = -origPoint.p3;
+            z = origPoint.p2;
+            break;
+        case 2:
+            x = origPoint.p1;
+            y = -origPoint.p2;
+            z = -origPoint.p3;
+            break;
+        case 3:
             x = origPoint.p1;
             y = origPoint.p3;
+            z = -origPoint.p2;
+            break;
+        case 4:
+            x = -origPoint.p1;
+            y = origPoint.p3;
             z = origPoint.p2;
-        }
-        else if ((status & 56) == 16) {
-            //xyz -> yxz
+            break;
+        case 5:
+            x = -origPoint.p1;
+            y = -origPoint.p2;
+            z = origPoint.p3;
+            break;
+        case 6:
+            x = -origPoint.p1;
+            y = -origPoint.p3;
+            z = -origPoint.p2;
+            break;
+        case 7:
+            x = -origPoint.p1;
+            y = origPoint.p2;
+            z = -origPoint.p3;
+            break;
+        case 8:
             x = origPoint.p2;
             y = origPoint.p1;
-            z = origPoint.p3;
-        }
-        else if ((status & 56) == 24) {
-            //xyz -> yzx
+            z = -origPoint.p3;
+            break;
+        case 9:
             x = origPoint.p2;
             y = origPoint.p3;
             z = origPoint.p1;
-        }
-        else if ((status & 56) == 32) {
-            //xyz -> zxy
+            break;
+        case 10:
+            x = origPoint.p2;
+            y = -origPoint.p1;
+            z = origPoint.p3;
+            break;
+        case 11:
+            x = origPoint.p2;
+            y = -origPoint.p3;
+            z = -origPoint.p1;
+            break;
+        case 12:
+            x = -origPoint.p2;
+            y = origPoint.p1;
+            z = origPoint.p3;
+            break;
+        case 13:
+            x = -origPoint.p2;
+            y = -origPoint.p3;
+            z = origPoint.p1;
+            break;
+        case 14:
+            x = -origPoint.p2;
+            y = -origPoint.p1;
+            z = -origPoint.p3;
+            break;
+        case 15:
+            x = -origPoint.p2;
+            y = origPoint.p3;
+            z = -origPoint.p1;
+            break;
+        case 16:
             x = origPoint.p3;
             y = origPoint.p1;
             z = origPoint.p2;
-        }
-        else if ((status & 56) == 40) {
-            //xyz -> zyx
+            break;
+        case 17:
+            x = origPoint.p3;
+            y = -origPoint.p2;
+            z = origPoint.p1;
+            break;
+        case 18:
+            x = origPoint.p3;
+            y = -origPoint.p1;
+            z = -origPoint.p2;
+            break;
+        case 19:
             x = origPoint.p3;
             y = origPoint.p2;
+            z = -origPoint.p1;
+            break;
+        case 20:
+            x = -origPoint.p3;
+            y = origPoint.p2;
             z = origPoint.p1;
-        }
-        else {
+            break;
+        case 21:
+            x = -origPoint.p3;
+            y = -origPoint.p1;
+            z = origPoint.p2;
+            break;
+        case 22:
+            x = -origPoint.p3;
+            y = -origPoint.p2;
+            z = -origPoint.p1;
+            break;
+        case 23:
+            x = -origPoint.p3;
+            y = origPoint.p1;
+            z = -origPoint.p2;
+            break;
+
+
+        default:
             cout << "NVV" << endl;
             throw(status);
         }
 
         Points np(x,y,z);
-
-        if (status & 1) {
-            np.p1 *= -1;
-        }
-        if (status & 2) {
-            np.p2 *= -1;
-        }
-        if (status & 4) {
-            np.p3 *= -1;
-        }
         pointsStatus.push_back(np);
     }
 }
