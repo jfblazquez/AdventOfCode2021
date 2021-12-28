@@ -98,10 +98,15 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
 
     for (auto& s1point : scanner1.pointsStatus) {
         for (auto& s2point : scanner2.pointsStatus) {
-            int diff = s1point.p1 - s2point.p1; //sign may change
-            histogramDiff[diff]++;
+            int diff = s1point.p1 - s2point.p1;
+            auto& val = histogramDiff[diff];            
+            if (++val >= 12) {
+                goto endOfLoopP1;
+            }
         }
     }
+
+    endOfLoopP1:
 
     map<int, int>::iterator x = std::max_element(histogramDiff.begin(), histogramDiff.end(),
         [](auto& p1, auto& p2) {
@@ -109,16 +114,22 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
 
     int maxOverlapX = x->second;
     bool overlapX = maxOverlapX >= 12;
+    if (!overlapX) return false;
     relativePos.p1 = x->first;
 
     histogramDiff.clear();
 
     for (auto& s1point : scanner1.pointsStatus) {
         for (auto& s2point : scanner2.pointsStatus) {
-            int diff = s1point.p2 - s2point.p2; //sign may change
-            histogramDiff[diff]++;
+            int diff = s1point.p2 - s2point.p2;
+            auto &val = histogramDiff[diff];
+            if (++val >= 12) {
+                goto endOfLoopP2;
+            }
         }
     }
+
+    endOfLoopP2:
 
     auto y = std::max_element(histogramDiff.begin(), histogramDiff.end(),
         [](auto& p1, auto& p2) {
@@ -126,16 +137,22 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
 
     int maxOverlapY = y->second;
     bool overlapY = maxOverlapY >= 12;
+    if (!overlapY) return false;
     relativePos.p2 = y->first;
 
     histogramDiff.clear();
 
     for (auto& s1point : scanner1.pointsStatus) {
         for (auto& s2point : scanner2.pointsStatus) {
-            int diff = s1point.p3 - s2point.p3; //sign may change
-            histogramDiff[diff]++;
+            int diff = s1point.p3 - s2point.p3;
+            auto& val = histogramDiff[diff];
+            if (++val >= 12) {
+                goto endOfLoopP3;
+            }
         }
     }
+
+    endOfLoopP3:
 
     auto z = std::max_element(histogramDiff.begin(), histogramDiff.end(),
         [](auto& p1, auto& p2) {
@@ -143,9 +160,10 @@ bool Day19::hasOverlapping(Scanner& scanner1, Scanner& scanner2, Points& relativ
 
     int maxOverlapZ = z->second;
     bool overlapZ = maxOverlapZ >= 12;
+    if (!overlapZ) return false;
     relativePos.p3 = z->first;
 
-    return overlapX && overlapY && overlapZ;
+    return true;
 }
 bool Day19::setRelativePosition(Scanner& stationaryScanner, Scanner& unknownScanner) {
     int status = 0;
