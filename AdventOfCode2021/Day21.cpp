@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <limits>
 #include "NotImplementedException.h"
 using namespace std;
 
@@ -43,8 +44,8 @@ int Day21::puzzle2() {
     bool firstWin = false;
     auto [player1, player2] = play(0, 0, posP1, posP2, 0, 0, firstWin);
     long long ret = player1 > player2 ? player1 : player2;
-    cout << "Day21: " << ret << endl;
-    return ret;
+    cout << "Day " << getDay() << " puzzle 2: " << ret << "\n";
+    return std::numeric_limits<int>::max();
 }
 
 int Day21::getDiceVal() {
