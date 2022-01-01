@@ -12,14 +12,21 @@ public:
 private:
     int getDiceVal();
     int moveNewPos(int& playerPos, int value);
+    pair<long long, long long> play(int score1, int score2, int pos1, int pos2, int val1, int val2, long long univ);
+    int getUniv(int val);
 
-    int diceVal{100};
+    int diceVal{};
     int scoreP1{};
     int scoreP2{};
     int posP1{};
     int posP2{};
     int numRolls{};
+    int dieSides{};
+    long long winsP1{};
+    long long winsP2{};
     
+    //debug
+    long long plays{};
 };
 
 
