@@ -13,10 +13,19 @@ public:
     array <int, 3> init{ 0,0,0 };
     array <int, 3> end{ 0,0,0 };
     bool contains(int x, int y, int z);
+    void remove(Region& r, vector<Region>& newRegions);
     bool off() {
         return !on;
     }
+    long long size();
 };
+
+class RegionAlgorithm
+{
+public: 
+    static bool intersect(Region& r1, Region& r2);
+};
+
 class Day22 : 
     public BaseDay {    
 public:
