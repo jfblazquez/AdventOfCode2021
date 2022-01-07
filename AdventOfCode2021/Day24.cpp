@@ -4,6 +4,8 @@
 #include <vector>
 #include <cstdlib>
 #include <thread>
+#include <map>
+#include <execution>
 #include "NotImplementedException.h"
 using namespace std;
 
@@ -63,10 +65,10 @@ int Day24::puzzle1() {
     std::random_device rd;
 
     thread t1(&Day24::calc,this, "T1", std::mt19937(rd()));
-    thread t2(&Day24::calc, this, "T2", std::mt19937(rd()));
+    /*thread t2(&Day24::calc, this, "T2", std::mt19937(rd()));
     thread t3(&Day24::calc, this, "T3", std::mt19937(rd()));
     thread t4(&Day24::calc, this, "T4", std::mt19937(rd()));
-    thread t5(&Day24::calc, this, "T5", std::mt19937(rd()));
+    thread t5(&Day24::calc, this, "T5", std::mt19937(rd()));*/
     t1.join();
     /*t2.join();
     t3.join();
@@ -127,68 +129,96 @@ void Day24::calc(string thread, std::mt19937 mt)
 {
 
     bool first = true;
-    Cpu cpu;
-    cpu.reset();
-    cpu.input.fill(1);
-    array <int, 14> inputMax;
+    Cpu* pcpu = new Cpu();
+    Cpu& cpuInit = *pcpu;
+    cpuInit.reset();
+    cpuInit.input.fill(1);
+    inputType inputMax;
     inputMax.fill(0);
-    //cpu.input = { 4,8,8,1,3,8,5,6,2,7,5,5,6,1 }; gives 13
-    //cpu.input = { 4,9,9,2,4,4,7,8,2,7,2,7,8,1 }; close to one 13 49924478272777
 
-    do {
-        cpu.reset();
-        //decreaseInput(cpu);
-        decreaseRandom(cpu, mt);
-        if (first) {
-            first = false;
-            mtx.lock();
-            cout << "Thread " << thread << " Starts with ";
-            for (int n : cpu.input) {
-                cout << n;
-            }
-            cout << "\n";
-            mtx.unlock();
-        }
-        for (int pc = 0;auto & instruction : instructions) {
-            cpu.execute(instruction);
-            pc++;
-        }
-
-        int zz = cpu.reg[z];
-
-        /*mtx.lock();
+    cpuInit.reset();
+    //decreaseInput(cpu);
+    if (first) {
+        first = false;
+        mtx.lock();
         cout << "Thread " << thread << " Starts with ";
-        for (int n : cpu.input) {
+        for (int n : cpuInit.input) {
             cout << n;
         }
         cout << "\n";
-        mtx.unlock();*/
+        mtx.unlock();
+    }
 
-        if (zz > -13 && zz < 12) {
-            for (int idx = 0;idx < 14; idx++) {
-                if (inputMax[idx] > cpu.input[idx]) {
-                    break;
+    /*vector<Cpu> cpuTest{ Cpu(),Cpu(),Cpu() };
+    cpuTest[0].input.fill(4);
+    cpuTest[1].input.fill(9);
+    cpuTest[2].input.fill(1);
+    std::sort(cpuTest.begin(), cpuTest.end());*/
+    vector<Cpu*> cpus = { pcpu };
+    map <int, Cpu*> cpusByZ;
+
+    for (int pc = 0;auto & instruction : instructions) {
+
+        if (instruction.op == operation::inp) {
+            std::sort(cpus.begin(), cpus.end(), [](Cpu* a, auto* b) { return *a < *b;});
+            for (Cpu* pcpu : cpus) {
+                int regzz = pcpu->reg[z];
+                if (cpusByZ.find(regzz) == cpusByZ.end()) {
+                    cpusByZ.insert(std::make_pair(regzz, pcpu));
                 }
-                else if (inputMax[idx] < cpu.input[idx]) {
-                    inputMax = cpu.input;
+                else {
+                    delete pcpu;
                 }
             }
 
-            mtx.lock();
-            cout << "Thread " << thread << " try: ";
+            cpus.clear();
+
+            for (auto& kvp : cpusByZ)
+            {
+                for (int i = 1; i <= 9; i++) {
+                    Cpu* newCpu = new Cpu(*kvp.second);
+                    newCpu->input[newCpu->inputPos] = i;
+                    cpus.push_back(newCpu);
+                }
+                delete kvp.second;
+            }
+            cpusByZ.clear();
+
+            size_t cpumb = (cpus.size() * (sizeof(Cpu) + sizeof(Cpu*)))/(1024*1024);
+            cout << "New cpus: " << cpus.size() << " (" << cpumb << " MB) at PC: " << pc << "\n";
+        }
+
+
+        std::for_each(
+            std::execution::par_unseq,
+            cpus.begin(), cpus.end(), [&] (auto && item){
+                item->execute(instruction);
+            });
+        /*for (Cpu* cpu : cpus) {
+            cpu->execute(instruction);
+        }*/
+        pc++;
+    }
+
+    //locate bigger z == 0;
+    std::sort(cpus.begin(), cpus.end(), [](Cpu* a, auto* b) { return *a < *b;});
+    for (Cpu* pcpu : cpus) {
+        Cpu& cpu = *pcpu;
+        int regzz = cpu.reg[z];
+        if (regzz == 0) {
+            cout << "Found: ";
             for (int n : cpu.input) {
                 cout << n;
             }
-            cout << " z: " << cpu.reg[z] << " maxInput ";
-
-            for (int n : inputMax) {
-                cout << n;
-            }
             cout << "\n";
-            mtx.unlock();
+            break;
         }
+    }
 
-    } while (true/*cpu.reg[z] != 0*/);
+    for (Cpu* pcpu : cpus) {
+        delete pcpu;
+    }
+
 }
 
 void Cpu::reset() {
@@ -232,4 +262,17 @@ void Cpu::print()
         << " y: " << reg[2]
         << " z: " << reg[3]
         << " inputPos " << inputPos << "\n";
+}
+
+bool Cpu::operator<(Cpu& rhs)
+{
+    inputType& l = this->input;
+    inputType& r = rhs.input;
+    for (int i = 0; i < 14; i++) {
+        if (l[i] != r[i]) {
+            return l > r;
+        }
+    }
+    return true;
+
 }

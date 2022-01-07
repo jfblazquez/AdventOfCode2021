@@ -4,6 +4,8 @@
 #include <mutex>
 #include "BaseDay.h"
 
+using inputType = array<unsigned char, 14>;
+
 enum class operation {
     inp,add,mul,div,mod,eql,nop
 };
@@ -22,7 +24,7 @@ public:
 class Cpu{
 public:
     array <int, 4> reg{ 0,0,0,0 }; //w[0], x[1], y[2], z[3]
-    array <int, 14> input;
+    inputType input;
     int inputPos{};
     int inpOp() {
         return input[inputPos++];
@@ -30,6 +32,7 @@ public:
     void reset();
     void execute(const Instruction& instruction);
     void print();
+    bool operator< (Cpu& rhs);
 };
 
 class Day24 : 
