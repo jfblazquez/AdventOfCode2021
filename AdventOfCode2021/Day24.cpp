@@ -160,13 +160,17 @@ void Day24::calc(string thread, std::mt19937 mt)
     for (int pc = 0;auto & instruction : instructions) {
 
         if (instruction.op == operation::inp) {
-            std::sort(cpus.begin(), cpus.end(), [](Cpu* a, auto* b) { return *a < *b;});
             for (Cpu* pcpu : cpus) {
                 int regzz = pcpu->reg[z];
-                if (cpusByZ.find(regzz) == cpusByZ.end()) {
+                auto&& find = cpusByZ.find(regzz);
+                if (find == cpusByZ.end()) {
                     cpusByZ.insert(std::make_pair(regzz, pcpu));
                 }
-                else {
+                else if (*pcpu < *find->second) {
+                    delete find->second;
+                    find->second = pcpu;
+                }
+                else {                    
                     delete pcpu;
                 }
             }
@@ -270,7 +274,8 @@ bool Cpu::operator<(Cpu& rhs)
     inputType& r = rhs.input;
     for (int i = 0; i < 14; i++) {
         if (l[i] != r[i]) {
-            return l > r;
+            return l > r; //for part 1
+            //return l < r; //for part 2
         }
     }
     return true;
