@@ -270,11 +270,17 @@ bool Cpu::operator<(Cpu& rhs)
 {
     inputType& l = this->input;
     inputType& r = rhs.input;
-    for (int i = 0; i < 14; i++) {
-        if (l[i] != r[i]) {
-            return l > r; //for part 1
-            //return l < r; //for part 2
+    
+    auto itl = l.begin();
+    auto itr = r.begin();
+    auto itend = l.end();
+    while (itl != itend) {
+        if (*itl != *itr) {
+            return *itl > *itr;
+            return *itl < *itr; //for part 2
         }
+        itl++;
+        itr++;
     }
     return true;
 
