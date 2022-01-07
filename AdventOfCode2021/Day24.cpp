@@ -206,7 +206,7 @@ void Day24::calc(string thread, std::mt19937 mt)
     }
 
     //locate bigger z == 0;
-    std::sort(cpus.begin(), cpus.end(), [](Cpu* a, auto* b) { return *a < *b;});
+    /*std::sort(cpus.begin(), cpus.end(), [](Cpu* a, auto* b) { return *a < *b;});
     for (Cpu* pcpu : cpus) {
         Cpu& cpu = *pcpu;
         int regzz = cpu.reg[z];
@@ -218,6 +218,27 @@ void Day24::calc(string thread, std::mt19937 mt)
             cout << "\n";
             break;
         }
+    }*/
+
+    Cpu* bestCpu = nullptr;
+    for (Cpu* pcpu : cpus) {
+        int regzz = pcpu->reg[z];
+        if (regzz == 0) {
+            if (nullptr == bestCpu) {
+                bestCpu = pcpu;
+            }
+            else if (*pcpu < *bestCpu) {
+                bestCpu = pcpu;
+            }
+        }
+    }
+
+    if (bestCpu) {
+        cout << "Found: ";
+        for (int n : bestCpu->input) {
+            cout << n;
+        }
+        cout << "\n";        
     }
 
     for (Cpu* pcpu : cpus) {
