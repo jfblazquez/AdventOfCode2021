@@ -127,7 +127,6 @@ void Day24::decreaseRandom(Cpu& cpu, std::mt19937 &mt)
 
 void Day24::calc(string thread, std::mt19937 mt)
 {
-
     bool first = true;
     Cpu* pcpu = new Cpu();
     Cpu& cpuInit = *pcpu;
@@ -137,7 +136,6 @@ void Day24::calc(string thread, std::mt19937 mt)
     inputMax.fill(0);
 
     cpuInit.reset();
-    //decreaseInput(cpu);
     if (first) {
         first = false;
         mtx.lock();
@@ -149,11 +147,6 @@ void Day24::calc(string thread, std::mt19937 mt)
         mtx.unlock();
     }
 
-    /*vector<Cpu> cpuTest{ Cpu(),Cpu(),Cpu() };
-    cpuTest[0].input.fill(4);
-    cpuTest[1].input.fill(9);
-    cpuTest[2].input.fill(1);
-    std::sort(cpuTest.begin(), cpuTest.end());*/
     vector<Cpu*> cpus = { pcpu };
     cpus.reserve(70000000);
     map <int, Cpu*> cpusByZ;
@@ -199,27 +192,10 @@ void Day24::calc(string thread, std::mt19937 mt)
             cpus.begin(), cpus.end(), [&] (auto && item){
                 item->execute(instruction);
             });
-        /*for (Cpu* cpu : cpus) {
-            cpu->execute(instruction);
-        }*/
         pc++;
     }
 
     //locate bigger z == 0;
-    /*std::sort(cpus.begin(), cpus.end(), [](Cpu* a, auto* b) { return *a < *b;});
-    for (Cpu* pcpu : cpus) {
-        Cpu& cpu = *pcpu;
-        int regzz = cpu.reg[z];
-        if (regzz == 0) {
-            cout << "Found: ";
-            for (int n : cpu.input) {
-                cout << n;
-            }
-            cout << "\n";
-            break;
-        }
-    }*/
-
     Cpu* bestCpu = nullptr;
     for (Cpu* pcpu : cpus) {
         int regzz = pcpu->reg[z];
