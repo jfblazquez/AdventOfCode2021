@@ -7,7 +7,7 @@
 using inputType = array<unsigned char, 14>;
 
 enum class operation {
-    inp,add,mul,div,mod,eql,nop
+    inp,add,mul,div,mod,eql,nop,neql,set
 };
 
 enum regs { w = 0, x, y, z };
@@ -45,6 +45,7 @@ private:
     void decreaseInput(Cpu& cpu);
     void decreaseRandom(Cpu& cpu, std::mt19937& mt);
     void calc(string thread, std::mt19937 mt);
+    void dynarec(vector<Instruction>& instructions);
 
     std::vector<Instruction> instructions;
     std::uniform_int_distribution<int> dist19{ 1, 9 };

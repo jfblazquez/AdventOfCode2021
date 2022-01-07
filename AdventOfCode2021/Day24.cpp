@@ -62,24 +62,12 @@ int Day24::puzzle1() {
         instructions.push_back(std::move(instruction));
     }
 
+    dynarec(instructions);
+
     std::random_device rd;
 
     thread t1(&Day24::calc,this, "T1", std::mt19937(rd()));
-    /*thread t2(&Day24::calc, this, "T2", std::mt19937(rd()));
-    thread t3(&Day24::calc, this, "T3", std::mt19937(rd()));
-    thread t4(&Day24::calc, this, "T4", std::mt19937(rd()));
-    thread t5(&Day24::calc, this, "T5", std::mt19937(rd()));*/
     t1.join();
-    /*t2.join();
-    t3.join();
-    t4.join();
-    t5.join();*/
-    
-    /*cout << "result: ";
-    for (int n : cpu.input) {
-        cout << n;
-    }
-    cout << "\n";*/
     return 0;
 }
 
@@ -223,6 +211,38 @@ void Day24::calc(string thread, std::mt19937 mt)
 
 }
 
+void Day24::dynarec(vector<Instruction>& instructions) {
+    size_t instructionsSize = instructions.size();
+    for (size_t i = 0; i < instructionsSize - 1; i++) {        
+        Instruction& current = instructions[i];
+        Instruction& next = instructions[i + 1];
+        //mul op 0; add op op2 --> set op op2
+        if (current.op == operation::mul &&
+            current.b == 0 &&
+            !current.bAsReg &&
+            current.a == next.a &&
+            next.op == operation::add) {
+        
+            current.op = operation::set;
+            current.b = next.b;
+            current.bAsReg = next.bAsReg;
+            instructions.erase(instructions.begin() + i + 1);
+            instructionsSize--;
+        }
+        //eql op op2; eql op 0 --> neql op op2
+        else if (current.op == operation::eql &&
+            next.op == operation::eql &&
+            current.a == next.a &&
+            next.b == 0 &&
+            !next.bAsReg) {
+
+            current.op = operation::neql;
+            instructions.erase(instructions.begin() + i + 1);
+            instructionsSize--;
+        }
+    }
+}
+
 void Cpu::reset() {
     reg.fill(0);
     inputPos = 0;
@@ -250,7 +270,13 @@ void Cpu::execute(const Instruction& instruction)
         reg[instruction.a] %= bVal;
         break;
     case operation::eql:
-        reg[instruction.a] = reg[instruction.a] == bVal ? 1 : 0;
+        reg[instruction.a] = reg[instruction.a] == bVal;
+        break;
+    case operation::neql:
+        reg[instruction.a] = reg[instruction.a] != bVal;
+        break;
+    case operation::set:
+        reg[instruction.a] = bVal;
         break;
     default:
         throw 0;
