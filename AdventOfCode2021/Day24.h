@@ -25,7 +25,7 @@ class Cpu{
 public:
     array <int, 4> reg{ 0,0,0,0 }; //w[0], x[1], y[2], z[3]
     inputType input;
-    int inputPos{};
+    unsigned char inputPos{};
     int inpOp() {
         return input[inputPos++];
     }

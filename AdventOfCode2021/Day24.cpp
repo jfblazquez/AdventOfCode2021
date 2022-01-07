@@ -155,6 +155,7 @@ void Day24::calc(string thread, std::mt19937 mt)
     cpuTest[2].input.fill(1);
     std::sort(cpuTest.begin(), cpuTest.end());*/
     vector<Cpu*> cpus = { pcpu };
+    cpus.reserve(70000000);
     map <int, Cpu*> cpusByZ;
 
     for (int pc = 0;auto & instruction : instructions) {
