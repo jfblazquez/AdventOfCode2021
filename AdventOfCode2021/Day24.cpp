@@ -75,8 +75,7 @@ int Day24::puzzle2() {
     throw NotImplementedException();
 }
 
-void Day24::decreaseInput(Cpu& cpu)
-{
+void Day24::decreaseInput(Cpu& cpu) {
     int pos = 13;
     bool done = false;
     while (!done) {
@@ -95,8 +94,7 @@ void Day24::decreaseInput(Cpu& cpu)
     }
 }
 
-void Day24::decreaseRandom(Cpu& cpu, std::mt19937 &mt)
-{
+void Day24::decreaseRandom(Cpu& cpu, std::mt19937 &mt) {
     
     for (int idx = 0;auto& n : cpu.input) {
         if (idx == 0) {
@@ -113,10 +111,9 @@ void Day24::decreaseRandom(Cpu& cpu, std::mt19937 &mt)
     }
 }
 
-void Day24::calc(string thread, std::mt19937 mt)
-{
+void Day24::calc(string thread, std::mt19937 mt) {
     bool first = true;
-    Cpu* pcpu = new Cpu();
+    Cpu* pcpu = fCpu.getNew();
     Cpu& cpuInit = *pcpu;
     cpuInit.reset();
     cpuInit.input.fill(1);
@@ -149,11 +146,11 @@ void Day24::calc(string thread, std::mt19937 mt)
                     cpusByZ.insert(std::make_pair(regzz, pcpu));
                 }
                 else if (*pcpu < *find->second) {
-                    delete find->second;
+                    fCpu.remove(find->second);
                     find->second = pcpu;
                 }
                 else {                    
-                    delete pcpu;
+                    fCpu.remove(pcpu);
                 }
             }
 
@@ -161,12 +158,14 @@ void Day24::calc(string thread, std::mt19937 mt)
 
             for (auto& kvp : cpusByZ)
             {
-                for (int i = 1; i <= 9; i++) {
-                    Cpu* newCpu = new Cpu(*kvp.second);
+                for (int i = 1; i <= 8; i++) {
+                    Cpu* newCpu = fCpu.getNew(*kvp.second);
                     newCpu->input[newCpu->inputPos] = i;
                     cpus.push_back(newCpu);
                 }
-                delete kvp.second;
+                //reuse old cpu 
+                kvp.second->input[kvp.second->inputPos] = 9;
+                cpus.push_back(kvp.second);
             }
             cpusByZ.clear();
 
@@ -205,6 +204,7 @@ void Day24::calc(string thread, std::mt19937 mt)
         cout << "\n";        
     }
 
+    //No need to use factory anymore
     for (Cpu* pcpu : cpus) {
         delete pcpu;
     }
@@ -250,13 +250,23 @@ void Day24::dynarec(vector<Instruction>& instructions) {
     }
 }
 
+inline Cpu::Cpu(Cpu& ref) {
+    //Do not copy x,y,w states. only from z
+    memcpy((int*)this + 3, (int*)(&ref) + 3, sizeof(Cpu) - 3 * sizeof(int));
+}
+
+Cpu& Cpu::operator=(const Cpu& ref) {
+    //Do not copy x,y,w states. only from z
+    memcpy((int*)this + 3, (int*)(&ref) + 3, sizeof(Cpu) - 3 * sizeof(int));
+    return *this;
+}
+
 void Cpu::reset() {
     reg.fill(0);
     inputPos = 0;
 }
 
-void Cpu::execute(const Instruction& instruction)
-{
+void Cpu::execute(const Instruction& instruction) {
     int bVal = instruction.bAsReg ? reg[instruction.b] : instruction.b;
 
     switch (instruction.op) {
@@ -290,8 +300,7 @@ void Cpu::execute(const Instruction& instruction)
     }
 }
 
-void Cpu::print()
-{
+void Cpu::print() {
     cout << "w: " << reg[0]
         << " x: " << reg[1]
         << " y: " << reg[2]
@@ -299,8 +308,7 @@ void Cpu::print()
         << " inputPos " << inputPos << "\n";
 }
 
-bool Cpu::operator<(Cpu& rhs)
-{
+bool Cpu::operator<(Cpu& rhs) {
     inputType& l = this->input;
     inputType& r = rhs.input;
     
@@ -317,4 +325,39 @@ bool Cpu::operator<(Cpu& rhs)
     }
     return true;
 
+}
+
+Cpu* FactoryCpu::getNew() {
+    if (pool.size()) {
+        Cpu* pcpu = pool.top();
+        pool.pop();
+        return pcpu;
+    }
+    return new Cpu();
+}
+
+Cpu* FactoryCpu::getNew(Cpu& ref) {
+    if (pool.size()) {
+        Cpu* pcpu = pool.top();
+        pool.pop();
+        *pcpu = ref;
+        return pcpu;
+    }
+    return new Cpu(ref);
+}
+
+void FactoryCpu::remove(Cpu* pcpu) {
+    if (pool.size() < POOL_SIZE) {
+        pool.push(pcpu);
+    }
+    else {
+        delete pcpu;
+    }
+}
+
+FactoryCpu::~FactoryCpu() {
+    while (pool.size()) {
+        delete pool.top();
+        pool.pop();
+    }
 }

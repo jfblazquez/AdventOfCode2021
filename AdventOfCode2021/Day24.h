@@ -2,10 +2,11 @@
 #include <array>
 #include <random>
 #include <mutex>
+#include <stack>
 #include "BaseDay.h"
 
 using inputType = array<unsigned char, 14>;
-
+#define POOL_SIZE 100
 enum class operation {
     inp,add,mul,div,mod,eql,nop,neql,set
 };
@@ -20,9 +21,11 @@ public:
     bool bAsReg{};
 };
 
-
 class Cpu{
 public:
+    Cpu() {};
+    Cpu(Cpu& ref);
+    Cpu& operator=(const Cpu& ref);
     array <int, 4> reg{ 0,0,0,0 }; //w[0], x[1], y[2], z[3]
     inputType input;
     unsigned char inputPos{};
@@ -33,6 +36,16 @@ public:
     void execute(const Instruction& instruction);
     void print();
     bool operator< (Cpu& rhs);
+};
+
+class FactoryCpu {
+public:    
+    Cpu* getNew();
+    Cpu* getNew(Cpu& ref);
+    void remove(Cpu* pcpu);
+    ~FactoryCpu();
+private:
+    stack<Cpu*> pool;
 };
 
 class Day24 : 
@@ -51,6 +64,6 @@ private:
     std::uniform_int_distribution<int> dist19{ 1, 9 };
     std::uniform_int_distribution<int> dist34{ 3, 4 };
     std::mutex mtx;
-
+    FactoryCpu fCpu;
 };
 
