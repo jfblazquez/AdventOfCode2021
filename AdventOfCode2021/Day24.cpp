@@ -240,6 +240,13 @@ void Day24::dynarec(vector<Instruction>& instructions) {
             instructions.erase(instructions.begin() + i + 1);
             instructionsSize--;
         }
+        //div op 1 --> nop (delete)
+        else if (current.op == operation::div &&
+            current.b == 1 &&
+            !current.bAsReg) {
+            instructions.erase(instructions.begin() + i);
+            instructionsSize--;
+        }
     }
 }
 
